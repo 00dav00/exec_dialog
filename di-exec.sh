@@ -8,14 +8,6 @@ OUTPUT=/tmp/output.sh.$$
 # trap and delete temp files
 trap "rm $OUTPUT; rm $INPUT; exit" SIGHUP SIGINT SIGTERM
 
-function display_output(){
-	local h=${1-10}			# box height default 10
-	local w=${2-41} 		# box width default 41
-	local t=${3-Output} 	# box title
-	dialog --backtitle "Select the command to execute: " --title "${t}" --clear --msgbox "$(<$OUTPUT)" ${h} ${w}
-  #
-}
-
 declare -a CAPTIONS
 declare -a COMMANDS
 
@@ -38,22 +30,48 @@ do OPTIONS="$OPTIONS $i ${CAPTIONS[$i]}"
 done
 
 
+# Define the dialog exit status codes
+: ${DIALOG_OK=0}
+: ${DIALOG_CANCEL=1}
+: ${DIALOG_HELP=2}
+: ${DIALOG_EXTRA=3}
+: ${DIALOG_ITEM_HELP=4}
+: ${DIALOG_ESC=255}
+
+
 while true
 do
-
+exec 3>&1
 ### display main menu ###
-dialog \
---clear \
---backtitle "di-exec" \
---title "[ SELECT A COMMAND ]" \
---menu "Use UP/DOWN arrow keys, Choose the command" 15 150 4 \
-$OPTIONS 2>"${INPUT}"
+menuitem=$(  dialog \
+              --clear \
+              --backtitle "di-exec" \
+              --title "[ SELECT A COMMAND ]" \
+              --cancel-label "Exit" \
+              --menu "Use UP/DOWN arrow keys, Choose the command" \
+              20 150 12 \
+              $OPTIONS \
+              2>&1 1>&3 )
 
-menuitem=$(<"${INPUT}")
+exit_status=$?
+
+exec 3>&-
+case $exit_status in
+  $DIALOG_CANCEL)
+    clear
+    echo "Program terminated."
+    exit
+    ;;
+  $DIALOG_ESC)
+    clear
+    echo "Program aborted." >&2
+    exit 1
+    ;;
+esac
 
 clear
 echo "Executing! \"${COMMANDS[$menuitem]}\" " $'\n\n'
-sleep 2
+sleep 1
 eval ${COMMANDS[$menuitem]}
 read -p "Press [Enter] key to continue..."
 
