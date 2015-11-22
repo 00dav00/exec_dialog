@@ -1,0 +1,16 @@
+{
+  "options": [
+    {"caption":"cat", "command":"cat /etc/hosts"},
+    {"caption":"grep", "command":"grep 'local' /etc/hosts"},
+    {"caption":"top", "command":"top"},
+    {"caption":"cat", "command":"cat /etc/hosts"},
+    {"caption":"grep", "command":"grep 'local' /etc/hosts"},
+    {"caption":"top", "command":"top"},
+    {"caption":"cat", "command":"cat /etc/hosts"},
+    {"caption":"grep", "command":"grep 'local' /etc/hosts"},
+    {"caption":"top", "command":"top"},
+    {"caption":"cat", "command":"cat /etc/hosts"},
+    {"caption":"grep", "command":"grep 'local' /etc/hosts"},
+    {"caption":"top", "command":"top"}
+  ]
+}
